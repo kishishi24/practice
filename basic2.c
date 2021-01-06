@@ -144,11 +144,16 @@ int main(){
     seed = (unsigned int)time(NULL);
     srand(seed);
     int r=1;
-    sol_c[0]=newtonMethod_c(conv_c(0),DELTA);
-    for(int i=0;i<1000;i++){
+    sol_c[0]=conv_c(0);
+    for(int i=0;i<8000;i++){
         complex x;
+        if(i<7000){
         x.real=(rand()%1001)-500;
         x.imag=(rand()%1001)-500;
+        }if(i>=7000){
+            x.real=(rand()%1001)-500;
+            x.imag=0;
+        }
         sol_c[r]=newtonMethod_c(x,DELTA);
         for(int j=0;j<r;j++){
             if(comp_c(sol_c[r],sol_c[j])==1){
