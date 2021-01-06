@@ -26,7 +26,7 @@ int comp_c(complex,complex);//複素数が一致するかの判定
 complex dif_c(complex (*Fx_c)(complex),complex);//関数の微分を返す
 //void newtonMethod(double a,double e,double *result,double *num);//ニュートンラフソン（実数)
 complex newtonMethod_c(complex a,double e);//  ニュートンラフソン(複素数)
-void get_sign(int a){//値の符号を得る関数（数式表示用）
+void get_sign(double a){//値の符号を得る関数（数式表示用）
     if(a>=0){printf("+");}
 }
 complex conv_c(double a){
@@ -71,7 +71,9 @@ complex pow_c(complex a,int n){
     return (b);
 }
 void show_c(complex a){
-    printf("%.5f+i%.5f\n",a.real,a.imag);
+    printf("%.5f",a.real,a.imag);
+    get_sign(a.imag);
+    printf("%.5fi\n",a.imag);
 }
 double val_c(complex a){
     return(sqrt(pow(a.real,2)+pow(a.imag,2)));
@@ -116,7 +118,7 @@ complex newtonMethod_c(complex a,double e){
         if(val_c(Fx_c(aa))<e){
             break;
         }if(i==999){
-            aa=conv_c(0);
+            aa=conv_c(100000000);
         }
         a=aa;
     }
@@ -144,16 +146,11 @@ int main(){
     seed = (unsigned int)time(NULL);
     srand(seed);
     int r=1;
-    sol_c[0]=conv_c(0);
+    sol_c[0]=conv_c(100000000);
     for(int i=0;i<8000;i++){
         complex x;
-        if(i<7000){
         x.real=(rand()%1001)-500;
         x.imag=(rand()%1001)-500;
-        }if(i>=7000){
-            x.real=(rand()%1001)-500;
-            x.imag=0;
-        }
         sol_c[r]=newtonMethod_c(x,DELTA);
         for(int j=0;j<r;j++){
             if(comp_c(sol_c[r],sol_c[j])==1){
