@@ -4,7 +4,7 @@
 #include<math.h>//pow（累乗)を使うのに必要
 #include<time.h>//timeを使う
 
-#define DELTA 1.0e-9//数値微分に使うデルタ
+#define DELTA 1.0e-10//数値微分に使うデルタ
 typedef struct {//複素数を表現する構造体の定義
     double real;
     double imag;
@@ -71,7 +71,7 @@ complex pow_c(complex a,int n){
     return (b);
 }
 void show_c(complex a){
-    printf("%.3f+i%.3f\n",a.real,a.imag);
+    printf("%.5f+i%.5f\n",a.real,a.imag);
 }
 double val_c(complex a){
     return(sqrt(pow(a.real,2)+pow(a.imag,2)));
@@ -115,6 +115,8 @@ complex newtonMethod_c(complex a,double e){
         aa=add_c(a,mul_c(conv_c(-1),div_c(Fx_c(a),dif_c(Fx_c,a))));
         if(val_c(Fx_c(aa))<e){
             break;
+        }if(i==999){
+            aa=conv_c(0);
         }
         a=aa;
     }
@@ -144,8 +146,10 @@ int main(){
     int r=1;
     sol_c[0]=newtonMethod_c(conv_c(0),DELTA);
     for(int i=0;i<1000;i++){
-        double x=(rand()%10001)-5000;
-        sol_c[r]=newtonMethod_c(conv_c(x),DELTA);
+        complex x;
+        x.real=(rand()%1001)-500;
+        x.imag=(rand()%1001)-500;
+        sol_c[r]=newtonMethod_c(x,DELTA);
         for(int j=0;j<r;j++){
             if(comp_c(sol_c[r],sol_c[j])==1){
                 break;
@@ -154,8 +158,8 @@ int main(){
             }
         }
     }
-    for(int i=0;i<r;i++){
-        printf("%d:",i);
+    for(int i=1;i<r;i++){
+        printf("%dつ目:",i);
         show_c(sol_c[i]);
     }
     return 0;
