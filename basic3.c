@@ -4,7 +4,7 @@
 #include<math.h>//pow（累乗)を使うのに必要
 #include<time.h>//timeを使う
 
-#define DELTA 1.0e-9//数値微分に使うデルタ
+#define DELTA 1.0e-10//数値微分に使うデルタ
 typedef struct {//複素数を表現する構造体の定義
     double real;
     double imag;
@@ -29,25 +29,25 @@ complex newtonMethod_c(complex a,double e);//  ニュートンラフソン(複�
 void get_sign(double a){//値の符号を得る関数（数式表示用）
     if(a>=0){printf("+");}
 }
-complex conv_c(double a){
+complex conv_c(double a){//double型をcomplex型に変換する関数
     complex b;
     b.real=a;
     b.imag=0;
     return (b);
 }
-complex add_c(complex a,complex b){
+complex add_c(complex a,complex b){//complexの和
     complex c;
     c.real=a.real+b.real;
     c.imag=a.imag+b.imag;
     return(c);
 }
-complex mul_c(complex a,complex b){
+complex mul_c(complex a,complex b){//complexの積
     complex c;
     c.real=a.real*b.real-a.imag*b.imag;
     c.imag=a.real*b.imag+a.imag*b.real;
     return(c);
 }
-complex div_c(complex a,complex b){
+complex div_c(complex a,complex b){//complexの商
     complex c,d;
     c.real=b.real;
     c.imag=-b.imag;
@@ -55,7 +55,7 @@ complex div_c(complex a,complex b){
     d.imag =mul_c(a,c).imag/(b.real*b.real+b.imag*b.imag);
     return (d);
 }
-complex pow_c(complex a,int n){
+complex pow_c(complex a,int n){//complexの累乗
     complex b;
     b.real=1;
     b.imag=0;
@@ -70,15 +70,15 @@ complex pow_c(complex a,int n){
     }
     return (b);
 }
-void show_c(complex a){
-    printf("%.5f",a.real,a.imag);
+void show_c(complex a){//complexの表示
+    printf("%.5f",a.real);
     get_sign(a.imag);
     printf("%.5fi\n",a.imag);
 }
-double val_c(complex a){
+double val_c(complex a){//complexの大きさ
     return(sqrt(pow(a.real,2)+pow(a.imag,2)));
 }
-double Fx(double a){
+double Fx(double a){//関数の値を返す（実数に限る）
     double sum=0;
     for(int i=0;i<=di;i++){
         sum+=coe[i]*pow(a,(double)(di-i));
@@ -86,7 +86,7 @@ double Fx(double a){
     }
     return sum;
 }
-complex Fx_c(complex a){
+complex Fx_c(complex a){//関数の値を返す(虚数)
     complex sum;
     sum.real=0;
     sum.imag=0;
@@ -96,20 +96,20 @@ complex Fx_c(complex a){
     }
     return (sum);
 }
-complex dif_c(complex (*Fx_c)(complex),complex xd){
+complex dif_c(complex (*Fx_c)(complex),complex xd){//関数の微分
     complex DIF,deno;
     deno = add_c(Fx_c(add_c(xd,conv_c(DELTA))),mul_c(conv_c(-1),Fx_c(add_c(xd,conv_c(-DELTA)))));
     DIF = div_c(deno,conv_c(2*DELTA));
     return DIF;
 }
-int comp_c(complex a,complex b){
+int comp_c(complex a,complex b){//complexの比較（大きさが等しいなら1を返す）（”等しい”の基準は緩めにした）
     if(fabs(a.real-b.real)<0.01&&fabs(a.imag-b.imag)<0.01){
         return 1;
     }else{
         return 0;
     }
 }
-complex newtonMethod_c(complex a,double e){
+complex newtonMethod_c(complex a,double e){//ニュートン法(虚数対応)
     int i=0;
     complex aa;
     while(i<1000){
@@ -118,23 +118,23 @@ complex newtonMethod_c(complex a,double e){
         if(val_c(Fx_c(aa))<e){
             break;
         }if(i==999){
-            aa=conv_c(100000000);
+            aa=sol_c[0];
         }
         a=aa;
     }
     return a;
 }
 
-int main(){
+int main(){//メイン
     printf("対象とする方程式は何次式ですか。整数で入力してください(100以下）\n次数:");
-    scanf("%d",&di);
+    scanf("%d",&di);//方程式の次数を決定
     printf("各次数の係数を入力してください。（整数、負数および小数は可、分数は不可）\n");
-    for(int i=0;i<=di;i++){
+    for(int i=0;i<=di;i++){//係数を受け取り、用意していた配列に格納
         printf("x^%d:",di-i);
         scanf("%lf",&coe[i]);
         //printf("%lf\n",coe[i]);//確認
     }
-    printf("対象とする方程式は     \n");
+    printf("対象とする方程式は     \n");//方程式の表示
     for(int j=0;j<=di;j++){
         get_sign(coe[j]);
         printf("%fx^%d",coe[j],di-j);
@@ -143,29 +143,28 @@ int main(){
     //printf("%lf",Fx(2.0));
     printf("答えは、\n");
     unsigned int seed;
-    seed = (unsigned int)time(NULL);
+    seed = (unsigned int)time(NULL);//ランダム初期値を、時間を種にして生成
     srand(seed);
     int r=1;
-    sol_c[0]=conv_c(100000000);
-    for(int i=0;i<8000;i++){
+    sol_c[0]=conv_c(100000);//局所解を避けるための避け用の値
+    for(int i=0;i<8000;i++){//なんとなく8000回まわす
         complex x;
-        x.real=(rand()%1001)-500;
+        x.real=(rand()%1001)-500;//なんとなく初期値の範囲は-500～500にした
         x.imag=(rand()%1001)-500;
-        sol_c[r]=newtonMethod_c(x,DELTA);
-        for(int j=0;j<r;j++){
+        sol_c[r]=newtonMethod_c(x,DELTA);//r=1からnewtonMethodの値を入れていく
+        for(int j=0;j<r;j++){//その一個前のループまでに入れた値と同じなら、rを進めないようにする
             if(comp_c(sol_c[r],sol_c[j])==1){
                 break;
-            }if(j==r-1){
+            }if(j==r-1){//一個前のループまでに入れた値と全て異なることが確認出来たら、rを進める
                 r++;break;
             }
         }
     }
-    for(int i=1;i<r;i++){
+    for(int i=1;i<r;i++){//答えの表示
+        if(val_c(sol_c[i])<1000){//10000といった大きな実数が間違った解として算出されることがあるため、その対策。なぜこのようなミスが起こるのかは不明。
         printf("%dつ目:",i);
         show_c(sol_c[i]);
+        }
     }
     return 0;
 }
-
-
-
