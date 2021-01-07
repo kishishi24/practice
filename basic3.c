@@ -9,8 +9,8 @@ typedef struct {//複素数を表現する構造体の定義
     double real;
     double imag;
 } complex;
-int di;//di:方程式の次数
-double coe[100];//coe[]:係数を入れる配列
+int di;//方程式の次数
+double coe[100];//係数を入れる配列
 double sol[100];//解を入れる配列(実数)
 complex sol_c[100];//解を入れる配列(複素数)
 double Fx(double);//入力の値(実数）に対する関数値を返す
